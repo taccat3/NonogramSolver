@@ -93,7 +93,7 @@ public class UserInterface extends GBFrame implements KeyListener {
 							{3}};
 
 		int[][] columns5_5 = {{2},
-							{1,2},
+							{2,1},
 							{1,1},
 							{3},
 							{3}};

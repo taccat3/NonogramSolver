@@ -203,22 +203,51 @@ public class BoardSolver {
 	}
 	
 	public void solve() {
+		System.out.println("\n\n\n\n\n\n\nSTART");
+		long start = System.currentTimeMillis();
+		long curr = System.currentTimeMillis();
+		String str = "";
+		int repeatCount = 0;
 		fillInFullParts();
-		System.out.println(board.toString());
-		
-		fillInEdges();
-		System.out.println(board.toString());
-		
-		// checkOverlaps();
-		System.out.println(board.toString());
+			String str1 = board.toString();
+			if(!str.equals(str1)) {
+				System.out.println(str1);
+			}
+			str = str1;
 
+		while((curr - start) < 15 * 1000) {
+			fillInEdges();
+			String str2 = board.toString();
+			if(!str.equals(str2)) {
+				System.out.println(str2);
+			} else {
+				repeatCount++;
+			}
+			
+			checkOverlaps();
+			String str3 = board.toString();
+			if(!str2.equals(str3)) {
+				System.out.println(str3);
+			} else {
+				repeatCount++;
+			}
 
-		System.out.println(board.printBoard());
+			str = str3;
 
-		if(!isValidBoard()) {
-			System.out.println("INVALID BOARD");
+			// System.out.println(board.printBoard());
+			System.out.println(repeatCount);
+
+			if(!isSolved()) {
+				System.out.println("INVALID BOARD");
+			}  else {
+				System.out.println("SOLVED");
+			}
+
+			if(repeatCount > 50) {
+				System.out.println("BREAK OUT OF LOOP");
+				break;
+			}
 		}
-		
 	}
 	
 	
@@ -236,7 +265,8 @@ public class BoardSolver {
 			for(Number num : board.rows[i]) {
 				if(index != 0) { // add spaces if not at the beginning
 					index++;
-				} else if (num != null) { // add the numbers
+				} 
+				if (num != null) { // add the numbers
 					for(int count = index; count < index + num.val; count++) {
 						row[count] = num;
 					}
@@ -244,28 +274,60 @@ public class BoardSolver {
 				}	
 			}
 
-			index = row.length - 1;
+			index = board.width - 1;
+
 			// check the row from right to left
-			for(int j = board.width - 1; j >= 0; j--) {
-				if(index != board.width - 1) { // add spaces if not at the beginning
+			for(int j = board.rows[i].length - 1; j >= 0; j--) {
+				if(index != board.width - 1) { // add spaces if not at the beginning (technically the end) 
 					index--;
-				} else if(board.rows[i][j] != null) {
+				} 
+				if(board.rows[i][j] != null) {
 					for(int count = index; count > index - board.rows[i][j].val; count--) {
 						if (row[count] == board.rows[i][j]) { // is the exact same number
-							board.fill(i, index);
+							board.fill(i, count);
 						}
-						index -= board.rows[i][j].val;
 					}
-				}
-				
-					
+					index -= board.rows[i][j].val;
+				}	
 			}
-		}
-			
+		}	
 	}
 	
 	public void checkOverlapsColumns() {
-		
+		for(int i = 0; i < board.width; i++) {
+			Number[] column = new Number[board.height];
+			int index = 0;
+
+			// fill in the row from left to right
+			for(Number num : board.columns[i]) {
+				if(index != 0) { // add spaces if not at the beginning
+					index++;
+				} 
+				if (num != null) { // add the numbers
+					for(int count = index; count < index + num.val; count++) {
+						column[count] = num;
+					}
+					index += num.val;
+				}	
+			}
+
+			index = board.height - 1;
+
+			// check the row from right to left
+			for(int j = board.columns[i].length - 1; j >= 0; j--) {
+				if(index != board.height - 1) { // add spaces if not at the beginning (technically the end) 
+					index--;
+				} 
+				if(board.columns[i][j] != null) {
+					for(int count = index; count > index - board.columns[i][j].val; count--) {
+						if (column[count] == board.columns[i][j]) { // is the exact same number
+							board.fill(count, i);
+						}
+					}
+					index -= board.columns[i][j].val;
+				}	
+			}
+		}
 	}
 	
 	
@@ -326,7 +388,13 @@ public class BoardSolver {
 	private void fillInLastColumn() {
 		for(int i = 0; i < board.height; i++) {
 			if(board.isFilled(i, board.width-1)) {
-				int indexOfLastNumInRow = board.rows[i].length-1;
+				int indexOfLastNumInRow = 0;
+				for(int j = board.rows[i].length-1; j >= 0; j--) {
+					if(board.rows[i][j] != null) {
+						indexOfLastNumInRow = j;
+						break;
+					}
+				}
 				for(int j = board.width - board.rows[i][indexOfLastNumInRow].val; j < board.width; j++) {
 					board.fill(i, j);
 				}
@@ -388,11 +456,11 @@ public class BoardSolver {
 		return false;
 	}
 	
-	public boolean isValidBoard() {
-		return (isValidBoardRows() && isValidBoardColumns());
+	public boolean isSolved() {
+		return (isSolvedRows() && isValidColumns());
 	}
 	
-	private boolean isValidBoardRows() {
+	private boolean isSolvedRows() {
 		
 		// check the rows are valid
 		for(int i = 0; i < board.height; i++) { // row index
@@ -436,7 +504,7 @@ public class BoardSolver {
 		return true;
 	}
 	
-	private boolean isValidBoardColumns() {
+	private boolean isValidColumns() {
 		
 		// check the rows are valid
 		for(int i = 0; i < board.width; i++) { // row index
