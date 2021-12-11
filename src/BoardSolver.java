@@ -196,6 +196,12 @@ public class BoardSolver {
 
 			return str;
 		}
+	
+		enum State {
+			EMPTY,
+			__X__,
+			FILLED
+		}
 	}
 	
 	public BoardSolver(int[][] r, int[][] c) {
@@ -234,8 +240,11 @@ public class BoardSolver {
 
 			str = str3;
 
-			// System.out.println(board.printBoard());
-			System.out.println(repeatCount);
+			if(!str1.equals(board.printBoard())) {
+				System.out.println(board.printBoard());
+			}
+
+			str1 = board.printBoard();
 
 			if(!isSolved()) {
 				System.out.println("INVALID BOARD");
@@ -249,14 +258,33 @@ public class BoardSolver {
 			}
 		}
 	}
-	
-	
-	public void checkOverlaps() {
+
+
+	private boolean isDone() {
+		for(int i = 0; i < board.height; i++) {
+			isRowDone(i);
+		}
+		for(int i = 0; i < board.width; i++) {
+			isColumnDone(i);
+		}
+
+		return false;
+	}
+
+	private boolean isRowDone(int i) {
+		return false;
+	}
+
+	private boolean isColumnDone(int i) {
+		return false;
+	}
+
+	private void checkOverlaps() {
 		checkOverlapsRows();
 		checkOverlapsColumns();
 	}
 	
-	public void checkOverlapsRows() {
+	private void checkOverlapsRows() {
 		for(int i = 0; i < board.height; i++) {
 			Number[] row = new Number[board.width];
 			int index = 0;
@@ -293,7 +321,7 @@ public class BoardSolver {
 		}	
 	}
 	
-	public void checkOverlapsColumns() {
+	private void checkOverlapsColumns() {
 		for(int i = 0; i < board.width; i++) {
 			Number[] column = new Number[board.height];
 			int index = 0;
@@ -330,6 +358,7 @@ public class BoardSolver {
 		}
 	}
 	
+
 	
 	private void fillInEdges() {
 		fillInFirstRow();
@@ -406,6 +435,8 @@ public class BoardSolver {
 		}
 	}
 	
+
+	
 	public void fillInFullParts() {
 		int curr = 0;
 		for(int j = 0; j < board.rows.length; j++) {
@@ -455,6 +486,8 @@ public class BoardSolver {
 		}
 		return false;
 	}
+	
+	
 	
 	public boolean isSolved() {
 		return (isSolvedRows() && isValidColumns());
@@ -549,26 +582,8 @@ public class BoardSolver {
 		return true;
 	}
 	
-	private int getLength(RC rc) {
-		switch(rc) {
-		case COLUMN:
-			return board.height;
-		case ROW:
-			return board.width;
-		}
-		
-		return -1;
-	}
-	
 	enum RC {
 		ROW,
 		COLUMN
-	}
-	
-	enum State {
-		EMPTY,
-		__X__,
-		FILLED
-	}
-	
+	}	
 }
