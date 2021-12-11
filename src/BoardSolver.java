@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class BoardSolver {
+public class BoardSolver { // it works!
 	
 	Board board;
 	
