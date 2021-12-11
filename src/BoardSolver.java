@@ -272,6 +272,28 @@ public class BoardSolver {
 	}
 
 	private boolean isRowDone(int i) {
+		boolean onNum = false;
+		boolean space = false;
+		int curr = 0;
+		int currLeft = 0;
+
+		for(int j = 0; j < board.answers[i].length; i++) {
+			if(curr > board.metaRows[i][0]) {
+				return true;
+			} else if (space && board.isFilled(i, j)) {
+				throw new IllegalSolutionException();
+			} else if (!onNum && !space && board.isFilled(i,j)) {
+				onNum = true;
+				currLeft = board.rows[i][0].val - 1;
+			}
+
+
+			if(currLeft == 0) {
+				onNum = false;
+				space = true;
+			}
+		}
+
 		return false;
 	}
 
