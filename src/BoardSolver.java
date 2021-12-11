@@ -67,9 +67,17 @@ public class BoardSolver {
 		}
 
 		private Number[][] intToNumber(int[][] array) {
-			Number[][] newArray = new Number[array.length][array[0].length];
+
+			int max = 0;
+			for(int[] x : array) {
+				if(x.length > max) {
+					max = x.length;
+				}
+			}
+			Number[][] newArray = new Number[array.length][max];
 
 			for(int i = 0; i < array.length; i++) {
+				// System.out.println(Arrays.toString(array[i]));
 				for(int j = 0; j < array[i].length; j++) {
 					newArray[i][j] = new Number(array[i][j]);
 				}
@@ -111,18 +119,34 @@ public class BoardSolver {
 		}
 		
 		public String printBoard() {
-			String str = " _";
+			String str = "";
+			
+			// get the longest row for indent purposes
+			int max = 0;
+			for(Number[] row : rows) {
+				if(max < row.length) {
+					max = row.length;
+				}
+			}
+			
+			for(int i = 0; i < max; i++) {
+				str += "   ";
+			}
+			str += " _";
 			
 			for(int i = 0; i < width; i++) {
 				str += "__";
 			}
-			str += "\n" + getColumns() + " _";
+			str += "\n" + getColumns(max) + " _";
+			for(int i = 0; i < max; i++) {
+				str += "___";
+			}
 			for(int i = 0; i < width; i++) {
 				str += "__";
 			}
 			int rowCount = 0;
 			for(State[] row : answers) {
-				str +=  "\n" + getRow(rowCount) + "| ";
+				str +=  "\n| " + getRow(rowCount) + "| ";
 				rowCount++;
 				for(State square : row) {
 					str += (square == State.FILLED) ? "O " : "- ";
@@ -131,15 +155,21 @@ public class BoardSolver {
 			}
 			
 			str += "\n _";
+			for(int i = 0; i < max; i++) {
+				str += "___";
+			}
 			for(int i = 0; i < width; i++) {
 				str += "__";
 			}
 			return str;
 		}
 		
-		private String getColumns() {
+		private String getColumns(int indent) {
 			String str = "";
 			for(int i = columns[0].length - 1; i >= 0; i--) { // height/2 is the greatest possible number of sections in a column
+				for(int j = 0; j < indent; j++) {
+					str += "   ";
+				}
 				str += "| ";
 				for(Number[] column : columns) {
 					if(column[i] == null) {
@@ -155,7 +185,16 @@ public class BoardSolver {
 		}
 		
 		private String getRow(int i) {
-			return Arrays.toString(rows[i]).substring(1, rows[i].length);
+			String str = "";
+			for(Number num : rows[i]) {
+				if(num == null) {
+					str += "  ";
+				} else {
+					str += num.val + " ";
+				}
+			}
+
+			return str;
 		}
 	}
 	
@@ -165,12 +204,15 @@ public class BoardSolver {
 	
 	public void solve() {
 		fillInFullParts();
-		
 		System.out.println(board.toString());
 		
 		fillInEdges();
 		System.out.println(board.toString());
 		
+		// checkOverlaps();
+		System.out.println(board.toString());
+
+
 		System.out.println(board.printBoard());
 
 		if(!isValidBoard()) {
@@ -194,13 +236,29 @@ public class BoardSolver {
 			for(Number num : board.rows[i]) {
 				if(index != 0) { // add spaces if not at the beginning
 					index++;
-				}
-				if(num != null) { // add the numbers
+				} else if (num != null) { // add the numbers
 					for(int count = index; count < index + num.val; count++) {
 						row[count] = num;
 					}
 					index += num.val;
 				}	
+			}
+
+			index = row.length - 1;
+			// check the row from right to left
+			for(int j = board.width - 1; j >= 0; j--) {
+				if(index != board.width - 1) { // add spaces if not at the beginning
+					index--;
+				} else if(board.rows[i][j] != null) {
+					for(int count = index; count > index - board.rows[i][j].val; count--) {
+						if (row[count] == board.rows[i][j]) { // is the exact same number
+							board.fill(i, index);
+						}
+						index -= board.rows[i][j].val;
+					}
+				}
+				
+					
 			}
 		}
 			
