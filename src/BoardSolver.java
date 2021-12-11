@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class BoardSolver { // it works!
+public class BoardSolver {
 	
 	Board board;
 	
@@ -111,9 +111,12 @@ public class BoardSolver { // it works!
 		}
 		
 		public String printBoard() {
-			String str = " ";
+			String str = " _";
 			
-//			str += getColumns();
+			for(int i = 0; i < width; i++) {
+				str += "__";
+			}
+			str += "\n" + getColumns() + " _";
 			for(int i = 0; i < width; i++) {
 				str += "__";
 			}
@@ -136,19 +139,19 @@ public class BoardSolver { // it works!
 		
 		private String getColumns() {
 			String str = "";
-			for(int i = height/2; i >= 0; i--) {
-				str += "|  ";
+			for(int i = columns[0].length - 1; i >= 0; i--) { // height/2 is the greatest possible number of sections in a column
+				str += "| ";
 				for(Number[] column : columns) {
-					if(column.length - 1 < i) {
+					if(column[i] == null) {
 						str += "  ";
 					} else {
 						str += column[i].val + " ";
 					}
 				}
-				str += "|";
+				str += "|\n";
 			}
 			
-			return "";
+			return str;
 		}
 		
 		private String getRow(int i) {
@@ -184,7 +187,21 @@ public class BoardSolver { // it works!
 	
 	public void checkOverlapsRows() {
 		for(int i = 0; i < board.height; i++) {
-			int[] row = new int[board.width];
+			Number[] row = new Number[board.width];
+			int index = 0;
+
+			// fill in the row from left to right
+			for(Number num : board.rows[i]) {
+				if(index != 0) { // add spaces if not at the beginning
+					index++;
+				}
+				if(num != null) { // add the numbers
+					for(int count = index; count < index + num.val; count++) {
+						row[count] = num;
+					}
+					index += num.val;
+				}	
+			}
 		}
 			
 	}
