@@ -211,6 +211,38 @@ public class BoardSolver {
 
 	public void solve() {
 		System.out.println("\n\n\n\n\n\n\nSTART");
+
+		try {
+			fillInFullParts();
+			System.out.println("fill in full strips");
+			System.out.println(board.toString());
+			
+			fillInEdges();
+			System.out.println("fill in edges");
+			System.out.println(board.toString());
+				
+			checkOverlaps();
+			System.out.println("fill in overlaps");
+			System.out.println(board.toString());
+			
+			fillDone();
+			System.out.println("add x in Done Strips");
+			System.out.println(board.toString());
+
+			if (!isSolved()) {
+				System.out.println("...");
+			} else {
+				System.out.println("SOLVED");
+			}
+
+		} catch (IllegalSolutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void solve2() {
+		System.out.println("\n\n\n\n\n\n\nSTART");
 		long start = System.currentTimeMillis();
 		long curr = System.currentTimeMillis();
 		String str = "";
@@ -280,20 +312,26 @@ public class BoardSolver {
 
 	private void fillDone() throws IllegalSolutionException {
 		for (int i = 0; i < board.height; i++) {
-			if(isRowDone(i)) {
-				for(int j = 0; j < board.width; j++) {
-					if(!board.isEmpty(i, j)) {
+			if (isRowDone(i)) {
+				for (int j = 0; j < board.width; j++) {
+					if (!board.isEmpty(i, j)) {
 						board.setX(i, j);
 					}
+				}
+				for(Number num : board.rows[i]) {
+					num.completed = true;
 				}
 			}
 		}
 		for (int i = 0; i < board.width; i++) {
-			if(isColumnDone(i)) {
-				for(int j = 0; j < board.height; j++) {
-					if(!board.isEmpty(j, i)) {
+			if (isColumnDone(i)) {
+				for (int j = 0; j < board.height; j++) {
+					if (!board.isEmpty(j, i)) {
 						board.setX(j, i);
 					}
+				}
+				for(Number num : board.columns[i]) {
+					num.completed = true;
 				}
 			}
 		}
@@ -307,31 +345,29 @@ public class BoardSolver {
 		int currLeft = 0;
 
 		for (int j = 0; j < board.width; j++) {
-			if(done && board.isFilled(j, i)) { // finished but found extra section
+			if (done && board.isFilled(i, j)) { // finished but found extra section
 				return false;
-			} else if (curr > board.metaRows[i][0]) { // found all the sections
-				done = true;
 			} else if (!space && board.isFilled(i, j)) { // found part of a section
 				onNum = true;
-				if(currLeft == 0) {
+				if (currLeft == 0) {
 					currLeft = board.rows[i][curr].val - 1; // at the first part of a section
 				} else {
 					currLeft--; // in middle/end of section
 				}
-			} else if(onNum && board.isEmpty(i, j)) { // on section but empty
+			} else if (onNum && board.isEmpty(i, j)) { // on section but empty
 				return false;
-			} else if(space && !board.isFilled(i, j)) { // on space
+			} else if (space && !board.isFilled(i, j)) { // on space
 				space = false;
-			}  else if(onNum && !board.isX(i, j)) { // if marked with an X incorrectly
+			} else if (onNum && !board.isX(i, j)) { // if marked with an X incorrectly
 				throw new IllegalSolutionException("Incorrectly marked with X at: (" + i + ", " + j + ")");
-			} else if (space && board.isFilled(i, j)) { // if spacing was skipped
+			} else if (space && board.isFilled(j, i)) { // if spacing was skipped
 				throw new IllegalSolutionException("Spacing was skipped at: (" + i + ", " + j + ")");
-			} 
+			}
 
 			// move onto next section if current is finished
 			if (onNum && currLeft == 0) {
 				onNum = false;
-				space = (curr == board.metaColumns[i][0]) ? false: true;
+				space = (curr == board.metaRows[i][0]) ? false : true;
 				curr++;
 			}
 
@@ -351,20 +387,20 @@ public class BoardSolver {
 		int currLeft = 0;
 
 		for (int j = 0; j < board.height; j++) {
-			if(done && board.isFilled(j, i)) { // finished but found extra section
+			if (done && board.isFilled(j, i)) { // finished but found extra section
 				return false;
 			} else if (!space && board.isFilled(j, i)) { // found part of a section
 				onNum = true;
-				if(currLeft == 0) {
+				if (currLeft == 0) {
 					currLeft = board.columns[i][curr].val - 1; // at the first part of a section
 				} else {
 					currLeft--; // in middle/end of section
 				}
-			} else if(onNum && board.isEmpty(j, i)) { // on section but empty
+			} else if (onNum && board.isEmpty(j, i)) { // on section but empty
 				return false;
-			} else if(space && !board.isFilled(j, i)) { // on space
+			} else if (space && !board.isFilled(j, i)) { // on space
 				space = false;
-			} else if(onNum && !board.isX(j, i)) { // if marked with an X incorrectly
+			} else if (onNum && !board.isX(j, i)) { // if marked with an X incorrectly
 				throw new IllegalSolutionException("Incorrectly marked with X at: (" + j + ", " + i + ")");
 			} else if (space && board.isFilled(j, i)) { // if spacing was skipped
 				throw new IllegalSolutionException("Spacing was skipped at: (" + j + ", " + i + ")");
@@ -373,7 +409,7 @@ public class BoardSolver {
 			// move onto next section if current is finished
 			if (onNum && currLeft == 0) {
 				onNum = false;
-				space = (curr == board.metaColumns[i][0]) ? false: true;
+				space = (curr == board.metaColumns[i][0]) ? false : true;
 				curr++;
 			}
 
