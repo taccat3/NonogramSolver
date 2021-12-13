@@ -163,6 +163,9 @@ public class BoardSolver {
 			for (int i = 0; i < width; i++) {
 				str += "__";
 			}
+
+			str += "\n";
+
 			return str;
 		}
 
@@ -549,7 +552,91 @@ public class BoardSolver {
 		}
 	}
 
-	private void checkOverlapsColumns() {
+	private void checkOverlapsColumns() throws IllegalSolutionException {
+		for (int i = 0; i < board.width; i++) {
+			Number[] column = new Number[board.height];
+			int index = 0;
+			// fill in the column from left to right
+			for (int j = 0; j < board.columns[i].length; j++) {
+				Number num = board.columns[i][j];
+				if (index != 0) { // add spaces if not at the beginning
+					index++;
+				}
+				if (num != null) { // try to add the number
+					int numNeeded = num.val;
+					for (int count = index; count < index + num.val; count++) {
+						// check if they fit
+						if (board.isX(count, i)) {
+							// remove filled in spots for the num in "row"
+							for (int countReverse = count; countReverse >= index; countReverse--) {
+								column[countReverse] = null;
+							}
+
+							if (numNeeded > 0 && count >= column.length - 1) {
+								throw new IllegalSolutionException("Column cannot be filled");
+							}
+
+							// restart
+							index = count;
+							numNeeded = num.val;
+							continue;
+						} else {
+							numNeeded--;
+							column[count] = num;
+							if (numNeeded == 0) {
+								index = count + 1;
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			index = board.width - 1;
+
+			// check the column from right to left
+			for (int j = board.columns[i].length - 1; j >= 0; j--) {
+				if (index != board.height - 1) { // add spaces if not at the beginning (technically the end)
+					index--;
+				}
+
+				Number num = board.columns[i][j];
+
+				if (num != null) {
+					int numNeeded = num.val;
+					for (int count = index; count > index - num.val; count--) {
+						// check if they fit
+						if (board.isX(count, i)) {
+							// remove filled in spots for the num in "row"
+							for (int countReverse = count; countReverse <= index; countReverse++) {
+								board.empty(countReverse, i);
+							}
+
+							if (numNeeded > 0 && count <= 0) {
+								throw new IllegalSolutionException("Row cannot be filled");
+							}
+
+							// restart
+							index = count;
+							numNeeded = num.val;
+							continue;
+						} else {
+							numNeeded--;
+							if (column[count] == board.columns[i][j]) { // is the exact same number
+								board.fill(count, i);
+							}
+							if (numNeeded == 0) {
+								index = count + 1;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void checkOverlapsColumns2() {
 		for (int i = 0; i < board.width; i++) {
 			Number[] column = new Number[board.height];
 			int index = 0;
