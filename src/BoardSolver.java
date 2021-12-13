@@ -221,7 +221,7 @@ public class BoardSolver {
 			System.out.println("fill in edges");
 			System.out.println(board.toString());
 				
-			checkOverlaps();
+			checkOverlaps(); // TODO: add in skip Xs
 			System.out.println("fill in overlaps");
 			System.out.println(board.toString());
 			
