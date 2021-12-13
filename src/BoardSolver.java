@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// TODO: include threads or something? cuz this is the slowest thing ever (the for loops :/ )
+// TODO: i think im an idiot and put the column in backwards 
+
 public class BoardSolver {
 
 	Board board;
@@ -455,7 +458,7 @@ public class BoardSolver {
 	}
 
 	private void checkOverlaps() throws IllegalSolutionException {
-		checkOverlapsRows();
+		// checkOverlapsRows();
 		checkOverlapsColumns();
 	}
 
@@ -465,6 +468,7 @@ public class BoardSolver {
 			int index = 0;
 			// fill in the row from left to right
 			for (int j = 0; j < board.rows[i].length; j++) {
+				
 				Number num = board.rows[i][j];
 				if (index != 0) { // add spaces if not at the beginning
 					index++;
@@ -503,6 +507,9 @@ public class BoardSolver {
 
 			// check the row from right to left
 			for (int j = board.rows[i].length - 1; j >= 0; j--) {
+
+				
+
 				if (index != board.width - 1) { // add spaces if not at the beginning (technically the end)
 					index--;
 				}
@@ -512,6 +519,7 @@ public class BoardSolver {
 				if (num != null) {
 					int numNeeded = num.val;
 					for (int count = index; count > index - num.val; count--) {
+
 						// check if they fit
 						if (board.isX(i, count)) {
 							// remove filled in spots for the num in "row"
@@ -528,26 +536,18 @@ public class BoardSolver {
 							numNeeded = num.val;
 							continue;
 						} else {
+
 							numNeeded--;
 							if (row[count] == board.rows[i][j]) { // is the exact same number
 								board.fill(i, count);
 							}
 							if (numNeeded == 0) {
-								index = count + 1;
+								index = count - 1;
 								break;
 							}
 						}
 					}
 				}
-
-				// if (board.rows[i][j] != null) {
-				// for (int count = index; count > index - board.rows[i][j].val; count--) {
-				// if (row[count] == board.rows[i][j]) { // is the exact same number
-				// board.fill(i, count);
-				// }
-				// }
-				// index -= board.rows[i][j].val;
-				// }
 			}
 		}
 	}
@@ -594,6 +594,15 @@ public class BoardSolver {
 
 			index = board.width - 1;
 
+			if(i==1) {
+				String str = "[";
+				for(Number num : column) {
+					str += (num != null ? num.val : null) + ", ";
+				}
+				
+				System.out.println(str + "]");
+			}
+
 			// check the column from right to left
 			for (int j = board.columns[i].length - 1; j >= 0; j--) {
 				if (index != board.height - 1) { // add spaces if not at the beginning (technically the end)
@@ -606,6 +615,8 @@ public class BoardSolver {
 					int numNeeded = num.val;
 					for (int count = index; count > index - num.val; count--) {
 						// check if they fit
+						if(i==1)
+							System.out.println("countB: " + count + "\t" + board.answers[count][i]);
 						if (board.isX(count, i)) {
 							// remove filled in spots for the num in "row"
 							for (int countReverse = count; countReverse <= index; countReverse++) {
@@ -619,14 +630,17 @@ public class BoardSolver {
 							// restart
 							index = count;
 							numNeeded = num.val;
+							System.out.println("reset: " + numNeeded);
 							continue;
 						} else {
 							numNeeded--;
+							if(i ==1)
+								System.out.println("numNeeded: "+ numNeeded + "\tcount: " + count + "\tboard.columns[" + i + "][" + j + "]: " + board.columns[i][j]);
 							if (column[count] == board.columns[i][j]) { // is the exact same number
 								board.fill(count, i);
 							}
 							if (numNeeded == 0) {
-								index = count + 1;
+								index = count - 1;
 								break;
 							}
 						}
