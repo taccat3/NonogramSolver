@@ -21,7 +21,8 @@ public class BoardSolver {
 
 	public static class Board {
 		State[][] answers;
-		// [number of filled sections, sum of filled, sum defined space]
+		// [number of filled sections, sum of filled, sum defined space, 1 if done, 0 if
+		// not]
 		int[][] metaRows;
 		int[][] metaColumns;
 		Number[][] rows;
@@ -43,6 +44,7 @@ public class BoardSolver {
 			answers = new State[height][width];
 
 			for (int i = 0; i < height; i++) {
+
 				for (int j = 0; j < width; j++) {
 					answers[i][j] = State.EMPTY;
 				}
@@ -50,7 +52,7 @@ public class BoardSolver {
 		}
 
 		private int[][] getMeta(int[][] array) {
-			int[][] meta = new int[array.length][3];
+			int[][] meta = new int[array.length][4];
 
 			for (int i = 0; i < array.length; i++) {
 				meta[i][0] = 0;
@@ -60,7 +62,7 @@ public class BoardSolver {
 					meta[i][1] += num;
 				}
 				meta[i][2] = meta[i][0] + meta[i][1] - 1;
-
+				meta[i][3] = 0;
 			}
 
 			return meta;
@@ -216,17 +218,21 @@ public class BoardSolver {
 			fillInFullParts();
 			System.out.println("fill in full strips");
 			System.out.println(board.toString());
-			
+
 			fillInEdges();
 			System.out.println("fill in edges");
 			System.out.println(board.toString());
-				
+
 			checkOverlaps(); // TODO: add in skip Xs
 			System.out.println("fill in overlaps");
 			System.out.println(board.toString());
-			
+
 			fillDone();
 			System.out.println("add x in Done Strips");
+			System.out.println(board.toString());
+
+			checkOverlaps();
+			System.out.println("fill in overlaps 2");
 			System.out.println(board.toString());
 
 			if (!isSolved()) {
@@ -321,12 +327,13 @@ public class BoardSolver {
 						board.setX(i, j);
 					}
 				}
-				for(Number num : board.rows[i]) {
-					if(num != null) {
+				for (Number num : board.rows[i]) {
+					if (num != null) {
 						num.completed = true;
 					}
-					
+
 				}
+				board.metaRows[i][3] = 1;
 			}
 		}
 		for (int i = 0; i < board.width; i++) {
@@ -336,16 +343,22 @@ public class BoardSolver {
 						board.setX(j, i);
 					}
 				}
-				for(Number num : board.columns[i]) {
-					if(num != null) {
+				for (Number num : board.columns[i]) {
+					if (num != null) {
 						num.completed = true;
 					}
 				}
+				board.metaColumns[i][3] = 1;
 			}
 		}
 	}
 
 	private boolean isRowDone(int i) throws IllegalSolutionException {
+
+		if (board.metaRows[i][3] == 1) {
+			return true;
+		}
+
 		boolean onNum = false;
 		boolean space = false;
 		boolean done = false;
@@ -368,7 +381,8 @@ public class BoardSolver {
 				space = false;
 			} else if (onNum && !board.isX(i, j)) { // if marked with an X incorrectly
 				return false;
-				// throw new IllegalSolutionException("Incorrectly marked with X at: (" + i + ", " + j + ")");
+				// throw new IllegalSolutionException("Incorrectly marked with X at: (" + i + ",
+				// " + j + ")");
 			} else if (space && board.isFilled(j, i)) { // if spacing was skipped
 				throw new IllegalSolutionException("Spacing was skipped at: (" + i + ", " + j + ")");
 			}
@@ -389,6 +403,11 @@ public class BoardSolver {
 	}
 
 	private boolean isColumnDone(int i) throws IllegalSolutionException {
+
+		if (board.metaColumns[i][3] == 1) {
+			return true;
+		}
+
 		boolean onNum = false;
 		boolean space = false;
 		boolean done = false;
@@ -411,7 +430,8 @@ public class BoardSolver {
 				space = false;
 			} else if (onNum && !board.isX(j, i)) { // if marked with an X incorrectly
 				return false;
-				// throw new IllegalSolutionException("Incorrectly marked with X at: (" + j + ", " + i + ")");
+				// throw new IllegalSolutionException("Incorrectly marked with X at: (" + j + ",
+				// " + i + ")");
 			} else if (space && board.isFilled(j, i)) { // if spacing was skipped
 				throw new IllegalSolutionException("Spacing was skipped at: (" + j + ", " + i + ")");
 			}
@@ -431,26 +451,48 @@ public class BoardSolver {
 		return done;
 	}
 
-	private void checkOverlaps() {
+	private void checkOverlaps() throws IllegalSolutionException {
 		checkOverlapsRows();
 		checkOverlapsColumns();
 	}
 
-	private void checkOverlapsRows() {
+	private void checkOverlapsRows() throws IllegalSolutionException {
 		for (int i = 0; i < board.height; i++) {
 			Number[] row = new Number[board.width];
 			int index = 0;
-
 			// fill in the row from left to right
-			for (Number num : board.rows[i]) {
+			for (int j = 0; j < board.rows[i].length; j++) {
+				Number num = board.rows[i][j];
 				if (index != 0) { // add spaces if not at the beginning
 					index++;
 				}
-				if (num != null) { // add the numbers
+				if (num != null) { // try to add the number
+					int numNeeded = num.val;
 					for (int count = index; count < index + num.val; count++) {
-						row[count] = num;
+						// check if they fit
+						if (board.isX(i, count)) {
+							// remove filled in spots for the num in "row"
+							for (int countReverse = count; countReverse >= index; countReverse--) {
+								row[countReverse] = null;
+							}
+
+							if (numNeeded > 0 && count >= row.length - 1) {
+								throw new IllegalSolutionException("Row cannot be filled");
+							}
+
+							// restart
+							index = count;
+							numNeeded = num.val;
+							continue;
+						} else {
+							numNeeded--;
+							row[count] = num;
+							if (numNeeded == 0) {
+								index = count + 1;
+								break;
+							}
+						}
 					}
-					index += num.val;
 				}
 			}
 
@@ -461,14 +503,48 @@ public class BoardSolver {
 				if (index != board.width - 1) { // add spaces if not at the beginning (technically the end)
 					index--;
 				}
-				if (board.rows[i][j] != null) {
-					for (int count = index; count > index - board.rows[i][j].val; count--) {
-						if (row[count] == board.rows[i][j]) { // is the exact same number
-							board.fill(i, count);
+
+				Number num = board.rows[i][j];
+
+				if (num != null) {
+					int numNeeded = num.val;
+					for (int count = index; count > index - num.val; count--) {
+						// check if they fit
+						if (board.isX(i, count)) {
+							// remove filled in spots for the num in "row"
+							for (int countReverse = count; countReverse <= index; countReverse++) {
+								board.empty(i, countReverse);
+							}
+
+							if (numNeeded > 0 && count <= 0) {
+								throw new IllegalSolutionException("Row cannot be filled");
+							}
+
+							// restart
+							index = count;
+							numNeeded = num.val;
+							continue;
+						} else {
+							numNeeded--;
+							if (row[count] == board.rows[i][j]) { // is the exact same number
+								board.fill(i, count);
+							}
+							if (numNeeded == 0) {
+								index = count + 1;
+								break;
+							}
 						}
 					}
-					index -= board.rows[i][j].val;
 				}
+
+				// if (board.rows[i][j] != null) {
+				// for (int count = index; count > index - board.rows[i][j].val; count--) {
+				// if (row[count] == board.rows[i][j]) { // is the exact same number
+				// board.fill(i, count);
+				// }
+				// }
+				// index -= board.rows[i][j].val;
+				// }
 			}
 		}
 	}
