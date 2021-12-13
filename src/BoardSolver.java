@@ -235,8 +235,11 @@ public class BoardSolver {
 				System.out.println("SOLVED");
 			}
 
+			System.out.println(board.printBoard());
+
 		} catch (IllegalSolutionException e) {
 			// TODO Auto-generated catch block
+			System.out.println(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 	}
@@ -314,24 +317,29 @@ public class BoardSolver {
 		for (int i = 0; i < board.height; i++) {
 			if (isRowDone(i)) {
 				for (int j = 0; j < board.width; j++) {
-					if (!board.isEmpty(i, j)) {
+					if (board.isEmpty(i, j)) {
 						board.setX(i, j);
 					}
 				}
 				for(Number num : board.rows[i]) {
-					num.completed = true;
+					if(num != null) {
+						num.completed = true;
+					}
+					
 				}
 			}
 		}
 		for (int i = 0; i < board.width; i++) {
 			if (isColumnDone(i)) {
 				for (int j = 0; j < board.height; j++) {
-					if (!board.isEmpty(j, i)) {
+					if (board.isEmpty(j, i)) {
 						board.setX(j, i);
 					}
 				}
 				for(Number num : board.columns[i]) {
-					num.completed = true;
+					if(num != null) {
+						num.completed = true;
+					}
 				}
 			}
 		}
@@ -359,7 +367,8 @@ public class BoardSolver {
 			} else if (space && !board.isFilled(i, j)) { // on space
 				space = false;
 			} else if (onNum && !board.isX(i, j)) { // if marked with an X incorrectly
-				throw new IllegalSolutionException("Incorrectly marked with X at: (" + i + ", " + j + ")");
+				return false;
+				// throw new IllegalSolutionException("Incorrectly marked with X at: (" + i + ", " + j + ")");
 			} else if (space && board.isFilled(j, i)) { // if spacing was skipped
 				throw new IllegalSolutionException("Spacing was skipped at: (" + i + ", " + j + ")");
 			}
@@ -371,7 +380,7 @@ public class BoardSolver {
 				curr++;
 			}
 
-			if (curr > board.metaRows[i][0]) { // found all the sections
+			if (curr >= board.metaRows[i][0]) { // found all the sections
 				done = true;
 			}
 		}
@@ -401,7 +410,8 @@ public class BoardSolver {
 			} else if (space && !board.isFilled(j, i)) { // on space
 				space = false;
 			} else if (onNum && !board.isX(j, i)) { // if marked with an X incorrectly
-				throw new IllegalSolutionException("Incorrectly marked with X at: (" + j + ", " + i + ")");
+				return false;
+				// throw new IllegalSolutionException("Incorrectly marked with X at: (" + j + ", " + i + ")");
 			} else if (space && board.isFilled(j, i)) { // if spacing was skipped
 				throw new IllegalSolutionException("Spacing was skipped at: (" + j + ", " + i + ")");
 			}
@@ -413,7 +423,7 @@ public class BoardSolver {
 				curr++;
 			}
 
-			if (curr > board.metaColumns[i][0]) { // found all the sections
+			if (curr >= board.metaColumns[i][0]) { // found all the sections
 				done = true;
 			}
 		}
