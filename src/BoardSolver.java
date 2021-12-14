@@ -225,7 +225,7 @@ public class BoardSolver {
 		board = new Board(r, c);
 	}
 
-	public void solve2() {
+	public void solve() {
 		System.out.println("\n\n\n\n\n\n\nSTART");
 
 		try {
@@ -264,7 +264,7 @@ public class BoardSolver {
 		}
 	}
 
-	public void solve() {
+	public void solve2() {
 		System.out.println("\n\n\n\n\n\n\nSTART");
 		long start = System.currentTimeMillis();
 		long curr = System.currentTimeMillis();
@@ -362,6 +362,7 @@ public class BoardSolver {
 			}
 		}
 		for (int i = 0; i < board.width; i++) {
+			System.out.println("isColumnDone(" + i + "): " + isColumnDone(i));
 			if (isColumnDone(i)) {
 				for (int j = 0; j < board.height; j++) {
 					if (board.isEmpty(j, i)) {
