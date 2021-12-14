@@ -2,11 +2,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 // TODO: include threads or something? cuz this is the slowest thing ever (the for loops :/ )
-// TODO: i think im an idiot and put the column in backwards 
 
 public class BoardSolver {
 
 	Board board;
+
+	final int SECONDS = 1;
 
 	public static class Number {
 		int val;
@@ -37,6 +38,13 @@ public class BoardSolver {
 		public Board(int[][] r, int[][] c) {
 			rows = intToNumber(r);
 			columns = intToNumber(c);
+		
+			String str = "";
+			for(Number num : columns[1]) {
+				str += (num != null ? num.val : null) + ", ";
+			}
+
+			System.out.println("Column[1]: " + str);
 
 			metaRows = getMeta(r);
 			metaColumns = getMeta(c);
@@ -217,7 +225,7 @@ public class BoardSolver {
 		board = new Board(r, c);
 	}
 
-	public void solve() {
+	public void solve2() {
 		System.out.println("\n\n\n\n\n\n\nSTART");
 
 		try {
@@ -256,7 +264,7 @@ public class BoardSolver {
 		}
 	}
 
-	public void solve2() {
+	public void solve() {
 		System.out.println("\n\n\n\n\n\n\nSTART");
 		long start = System.currentTimeMillis();
 		long curr = System.currentTimeMillis();
@@ -271,7 +279,7 @@ public class BoardSolver {
 			}
 			str = str1;
 
-			while ((curr - start) < 15 * 1000) {
+			while ((curr - start) < SECONDS * 1000) {
 				fillInEdges();
 				String str2 = board.toString();
 				if (!str.equals(str2)) {
@@ -309,21 +317,32 @@ public class BoardSolver {
 					System.out.println("...");
 				} else {
 					System.out.println("SOLVED");
-				}
-
-				if (repeatCount > 50) {
 					break;
 				}
+
+				if (repeatCount > 10) {
+					break;
+				}
+
+				curr = System.currentTimeMillis();
 			}
 			if (!isSolved()) {
 				System.out.println("BREAK OUT OF LOOP - FAIL");
 			}
+
+			System.out.println(board.printBoard());
 
 		} catch (IllegalSolutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+
+	// method should check if a section can be filled in due to being limited by an x on 1 side
+	private void fillInXLimited() {
+
+	}
+
 
 	private void fillDone() throws IllegalSolutionException {
 		for (int i = 0; i < board.height; i++) {
@@ -458,7 +477,7 @@ public class BoardSolver {
 	}
 
 	private void checkOverlaps() throws IllegalSolutionException {
-		// checkOverlapsRows();
+		checkOverlapsRows();
 		checkOverlapsColumns();
 	}
 
@@ -615,8 +634,6 @@ public class BoardSolver {
 					int numNeeded = num.val;
 					for (int count = index; count > index - num.val; count--) {
 						// check if they fit
-						if(i==1)
-							System.out.println("countB: " + count + "\t" + board.answers[count][i]);
 						if (board.isX(count, i)) {
 							// remove filled in spots for the num in "row"
 							for (int countReverse = count; countReverse <= index; countReverse++) {
@@ -630,12 +647,9 @@ public class BoardSolver {
 							// restart
 							index = count;
 							numNeeded = num.val;
-							System.out.println("reset: " + numNeeded);
 							continue;
 						} else {
 							numNeeded--;
-							if(i ==1)
-								System.out.println("numNeeded: "+ numNeeded + "\tcount: " + count + "\tboard.columns[" + i + "][" + j + "]: " + board.columns[i][j]);
 							if (column[count] == board.columns[i][j]) { // is the exact same number
 								board.fill(count, i);
 							}
@@ -813,7 +827,7 @@ public class BoardSolver {
 	}
 
 	public boolean isSolved() {
-		return (isSolvedRows() && isValidColumns());
+		return (isSolvedRows() && isSolvedColumns());
 	}
 
 	private boolean isSolvedRows() {
@@ -859,7 +873,7 @@ public class BoardSolver {
 		return true;
 	}
 
-	private boolean isValidColumns() {
+	private boolean isSolvedColumns() {
 
 		// check the rows are valid
 		for (int i = 0; i < board.width; i++) { // row index
