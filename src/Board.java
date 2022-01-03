@@ -87,7 +87,7 @@ public class Board {
     public void empty(int i, int j) {
         answers[i][j] = State.EMPTY;
     }
-    
+
     public boolean isFilled(RC rc, int i, int j) {
         switch(rc) {
             case ROW:
@@ -120,6 +120,22 @@ public class Board {
                 return false;
         }
     }
+
+    // TODO: delete later?
+    public boolean isFilled(int i, int j) {
+        return answers[i][j] == State.FILLED;
+    }
+
+    public boolean isX(int i, int j) {
+        return answers[i][j] == State.__X__;
+    }
+
+    public boolean isEmpty(int i, int j) {
+        return answers[i][j] == State.EMPTY;
+    }
+
+
+
 
     public String printBoard() {
         String str = "";
