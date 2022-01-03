@@ -25,8 +25,6 @@ public class UserInterface extends GBFrame implements KeyListener {
 	private int height;
 	private int width;
 
-	Server server = new Server();
-
 	public UserInterface() {
 		sizeGUI = new LinkedList<JComponent>();
 		rcGUI = new LinkedList<JComponent>();
@@ -114,46 +112,9 @@ public class UserInterface extends GBFrame implements KeyListener {
 
 	public void buttonClicked(JButton btn) {
 		if (btn == sizeGUI.get(0)) {
-			IntegerField fldHeight = (IntegerField) sizeGUI.get(2);
-			IntegerField fldWidth = (IntegerField) sizeGUI.get(4);
-			if (fldHeight.isValidNumber() && fldWidth.isValidNumber()) {
-				height = fldHeight.getNumber();
-				width = fldWidth.getNumber();
-				if (height > 0 || width > 0) {
-					server.setHeightWidth(height, width);
-					hide(sizeGUI);
-					rcGUI.add(addTextArea("", 2, 1, 2, 2));
-					rcGUI.add(addLabel("Enter Rows, use spaces between numbers and enters between rows", 1, 1, 1, 1));
-
-					((JTextArea) rcGUI.get(1)).setRows(height);
-				}
-			}
+			
 		} else if (btn == rcGUI.get(0)) {
-			String input = ((JTextArea) rcGUI.get(1)).getText();
-			switch (server.getBoardState()) {
-				case 0:
-					if (server.process(input, Board2.RC.ROW)) {
-						((JLabel) rcGUI.get(2))
-								.setText("Enter Columns, use spaces between numbers and enters between columns");
-						((JTextArea) rcGUI.get(1)).setText("");
-					}
-					break;
-				case 1:
-					if (server.process(input, Board2.RC.COLUMN)) {
-						hide(rcGUI);
-
-						board = new JTable(new DefaultTableModel(server.getRows(), server.getColumnNums()));
-						System.out.println(server.print());
-					}
-					break;
-				case 2:
-					System.out.println("Not solved but HOW????");
-					break;
-				case 3:
-					System.out.println("HOW????");
-					break;
-			}
-
+			
 		}
 	}
 

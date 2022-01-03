@@ -1,0 +1,48 @@
+A board is organized like so:
+                                           ___________
+                                          | 2 1 1 3 3 | <- numbers closest to the top
+                                          |   2 1     | <- numbers closest to the bottom
+                                     _________________ 
+                                    | 3   | - - - - - |
+                                    | 2   | - - - - - |
+                                    | 2   | - - - - - |
+                                    | 2 1 | - - - - - |
+                                    | 3   | - - - - - |
+                                     _________________
+                                      ^
+                                      L numbers closest to the left
+
+
+        key:
+                -           unknown
+                x           must be empty
+                O           filled
+                section     a group of filled squares connected to each other
+                strip       a row or column
+
+Rows in Code:
+- In the code rows are converted into a 2D array, dimensions [height][longest number of sections]
+- For each row, the left most section number goes first, followed by any NULLs for extra space in the array
+
+Columns in Code:
+- In the code columns are converted into a 2D array, dimensions [width][longest number of sections]
+- For each column, the top most section number goes first, followed by any NULLs for extra space in the array
+
+Solved board
+                                           ___________
+                                          | 2 1 1 3 3 | <- numbers closest to the top
+                                          |   2 1     | <- numbers closest to the bottom
+                                     _________________ 
+                                    | 3   | x O O O x |
+                                    | 2   | x x x O O |
+                                    | 2   | x x x O O |
+                                    | 2 1 | O O x x O |
+                                    | 3   | O O O x x |
+                                     _________________
+
+
+Number[][] rowInfo = overlapsInRow(board.rows[i][j], index, i, j, row);
+				if(rowInfo != null) {
+					row = rowInfo[1];
+					index = rowInfo[0][0].val;
+				}

@@ -3,6 +3,8 @@ import java.util.Arrays;
 
 // TODO: include threads or something? cuz this is the slowest thing ever (the for loops :/ )
 
+// TODO: remove the checking if a row is filled to x it all out from the solve() function and put it within each method
+
 public class BoardSolver {
 
 	Board board;
@@ -25,7 +27,7 @@ public class BoardSolver {
 
 	public static class Board {
 		State[][] answers;
-		// [number of filled sections, sum of filled, sum defined space, 1 if done, 0 if
+		// [number of filled sections, sum of filled, sum defined space, 1 if done or 0 if
 		// not]
 		int[][] metaRows;
 		int[][] metaColumns;
@@ -267,6 +269,7 @@ public class BoardSolver {
 			System.out.println(board.printBoard());
 
 			fillDone();
+			// board = Done.fillDone(board);
 			System.out.println("add x in Done Strips");
 			System.out.println(board.printBoard());
 
@@ -509,13 +512,12 @@ public class BoardSolver {
 
 	private void checkOverlapsRows() throws IllegalSolutionException {
 		for (int i = 0; i < board.height; i++) {
+			if(board.metaRows[i][3] == 1) {
+				continue;
+			}
+
 			Number[] row = new Number[board.width];
 			int index = 0;
-
-			for(Number num : board.rows[i]) {
-				System.out.print((num != null ? num.val : null) + ", ");
-			}
-			System.out.println();
 
 			// fill in the row from left to right
 			for (int j = 0; j < board.rows[i].length; j++) {
@@ -608,8 +610,12 @@ public class BoardSolver {
 
 	private void checkOverlapsColumns() throws IllegalSolutionException {
 		for (int i = 0; i < board.width; i++) {
+			if(board.metaColumns[i][3] == 1) {
+				continue;
+			}
 			Number[] column = new Number[board.height];
 			int index = 0;
+
 			// fill in the column from left to right
 			for (int j = 0; j < board.columns[i].length; j++) {
 				Number num = board.columns[i][j];
