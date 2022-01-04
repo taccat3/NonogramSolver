@@ -3,9 +3,8 @@ import java.util.Arrays;
 public class Overlaps extends Solving {
     
 	public static Board checkOverlaps(Board board) throws IllegalSolutionException {
-		// board = checkOverlapsStrips(board, Board.RC.ROW);
-        // return checkOverlapsStrips(board, Board.RC.COLUMN);
-        return checkOverlapsStrips(board, Board.RC.ROW);
+		board = checkOverlapsStrips(board, Board.RC.ROW);
+        return checkOverlapsStrips(board, Board.RC.COLUMN);
 
 	}
 
@@ -20,6 +19,7 @@ public class Overlaps extends Solving {
 
 			// fill in the row from left to right
 			for (int j = 0; j < getNumSections(board, rc, i); j++) {
+                
 				Number num = getSection(board, rc, i, j);
 
 				// add spaces if NOT at the beginning
@@ -30,9 +30,9 @@ public class Overlaps extends Solving {
 				// try to add the number
 				if (num != null) { // check if number exists
 					int numNeeded = num.val;
-					for (int count = index; count < index + num.val; count++) {
+					for (int count = index; count <= index + num.val; count++) {
 						// check if they fit
-						if (board.isX(i, count)) {
+						if (board.isX(rc, i, count)) {
 							// remove filled in spots for the num in "row"
 							for (int countReverse = count; countReverse >= index; countReverse--) {
 								strip[countReverse] = null;
@@ -45,7 +45,7 @@ public class Overlaps extends Solving {
 							// restart
 							index = count;
 							numNeeded = num.val;
-							continue;
+							// continue;
 						} else {
 							numNeeded--;
 							strip[count] = num;
@@ -61,13 +61,8 @@ public class Overlaps extends Solving {
             // fill in row from right to left
             Number[] strip2 = checkRightToLeft(board, rc, i); // got locations of overlap in strip
 
-            System.out.println("i=" + i);
-            System.out.println(" strip: " + Arrays.toString(strip));
-            System.out.println("strip2: " + Arrays.toString(strip2) + "\n");
-
             for(int n = 0; n < strip.length; n++) {
-                if(strip[n] == strip2[n] && strip[n] != null) {
-                    System.out.println("n=" + n);
+                if(strip[n] == strip2[n] && strip[n] != null && !board.isFilled(rc, i, n)) {
                     board.fill(rc, i, n);
                 }
             }
@@ -95,10 +90,7 @@ public class Overlaps extends Solving {
             if (num != null) {
                 int numNeeded = num.val;
 
-                for (int count = index; count > index - num.val; count--) {
-                    if(i==0)
-                        System.out.println("count: " + count);
-
+                for (int count = index; count >= index - num.val; count--) {
 
                     // check if they fit
                     if (board.isX(rc, i, count)) {

@@ -94,8 +94,10 @@ public class Board {
         switch(rc) {
             case ROW:
                 answers[i][j] = State.FILLED;
+                break;
             case COLUMN:
                 answers[j][i] = State.FILLED;
+                break;
         }
     }
 
@@ -103,8 +105,10 @@ public class Board {
         switch(rc) {
             case ROW:
                 answers[i][j] = State.EMPTY;
+                break;
             case COLUMN:
                 answers[j][i] = State.EMPTY;
+                break;
         }
     }
 

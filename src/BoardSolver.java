@@ -47,14 +47,16 @@ public class BoardSolver {
 			board = Overlaps.checkOverlaps(board);
 			System.out.println(board.printBoard());
 
+			System.out.println("add x in Done Strips");
 			// fillDone();
 			board = Done.fillDone(board);
-			System.out.println("add x in Done Strips");
 			System.out.println(board.printBoard());
 
-			// // checkOverlaps();
-			// System.out.println("fill in overlaps 2");
-			// System.out.println(board.printBoard());
+			System.out.println("fill in overlaps 2");
+			// checkOverlaps(); // TODO: add in skip Xs
+			board = Overlaps.checkOverlaps(board);
+			System.out.println(board.printBoard());
+
 
 			if (!Done.isSolved(board)) {
 				System.out.println("...");
