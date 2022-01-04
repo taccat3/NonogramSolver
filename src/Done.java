@@ -1,4 +1,9 @@
-public class Done {
+import java.util.ArrayList;
+
+public class Done extends Solving{
+
+	// fills in Done Sections
+	
 	public static Board fillDone(Board board) throws IllegalSolutionException {
 		for (int i = 0; i < board.height; i++) {
 			if (isStripDone(board, i, Board.RC.ROW)) {
@@ -35,7 +40,7 @@ public class Done {
 		return board;
 	}
 
-	private static boolean isStripDone(Board board, int i, Board.RC rc) throws IllegalSolutionException {
+	public static boolean isStripDone(Board board, int i, Board.RC rc) throws IllegalSolutionException {
 
 		if(alreadyDone(board, i, rc)) {
 			return true;
@@ -56,7 +61,7 @@ public class Done {
 			} else if (!space && isFilled) { // found part of a section
 				onNum = true;
 				if (currLeft == 0) {
-					currLeft = getNextSection(board, rc, i, curr); // at the first part of a section
+					currLeft = getSection(board, rc, i, curr).val - 1; // at the first part of a section // TODO: possible error?
 				} else {
 					currLeft--; // in middle/end of section
 				}
@@ -89,7 +94,57 @@ public class Done {
 		return done;
 	}
 
-	private static int getNumSections(Board board, Board.RC rc, int i) {
+	// checks if board is solved
+
+	public static boolean isSolved(Board board) {
+		return (isSolvedRC(board, Board.RC.ROW) && isSolvedRC(board, Board.RC.COLUMN));
+	}
+
+	private static boolean isSolvedRC(Board board, Board.RC rc) {
+
+		// check the rows are valid
+		for (int i = 0; i < getNumStrips(board, rc); i++) { // strip index
+			ArrayList<Integer> nums = new ArrayList<Integer>();
+			int num = 0;
+			boolean onPart = false;
+			for (int j = 0; j < getLength(board, rc); j++) { // square index
+				boolean isFilled = board.isFilled(rc, i, j);
+				if (onPart) {
+					if (isFilled) {
+						num++;
+						if (j == board.width - 1) {
+							nums.add(num);
+						}
+					} else if (!isFilled) {
+						nums.add(num);
+						num = 0;
+						onPart = false;
+					}
+				} else {
+					if (isFilled) {
+						num++;
+						onPart = true;
+					}
+				}
+			}
+
+			if (nums.size() == 0) {
+				nums.add(0);
+			}
+
+			// check if nums is the same as strip
+			for (int n = 0; n < getStripSectionsNum(board, rc, i); n++) {
+				Number stripNum = getStripNum(board, rc, i, n);
+				if (stripNum.val != nums.get(n)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	private static int getStripSectionsNum(Board board, Board.RC rc, int i) {
 		switch(rc) {
 			case ROW:
 				return board.metaRows[i][0];
@@ -100,44 +155,14 @@ public class Done {
 		}
 	}
 
-	private static int getNextSection(Board board, Board.RC rc, int i, int curr) {
+	private static Number getStripNum(Board board, Board.RC rc, int i, int n) {
 		switch(rc) {
 			case ROW:
-				return board.rows[i][curr].val - 1;
+				return board.rows[i][n];
 			case COLUMN:
-				return board.columns[i][curr].val - 1;
+				return board.columns[n][i];
 			default:
-				return -1;
-		}
-	}
-
-	private static boolean alreadyDone(Board board, int i, Board.RC rc) {
-
-		int isComplete = 0;
-		switch(rc) {
-			case ROW:
-				isComplete = board.metaRows[i][3];
-				break;
-			case COLUMN: 
-				isComplete = board.metaColumns[i][3];
-				break;
-		}
-
-		if (isComplete == 1) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private static int getLength(Board board, Board.RC rc) {
-		switch(rc) {
-			case ROW:
-				return board.width;
-			case COLUMN:
-				return board.height;
-			default:
-				return -1;
+				return null;
 		}
 	}
 }

@@ -88,6 +88,30 @@ public class Board {
         answers[i][j] = State.EMPTY;
     }
 
+
+
+    public void fill(RC rc, int i, int j) {
+        switch(rc) {
+            case ROW:
+                answers[i][j] = State.FILLED;
+            case COLUMN:
+                answers[j][i] = State.FILLED;
+        }
+    }
+
+    public void empty(RC rc, int i, int j) {
+        switch(rc) {
+            case ROW:
+                answers[i][j] = State.EMPTY;
+            case COLUMN:
+                answers[j][i] = State.EMPTY;
+        }
+    }
+
+
+
+
+
     public boolean isFilled(RC rc, int i, int j) {
         switch(rc) {
             case ROW:

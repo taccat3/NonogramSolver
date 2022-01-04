@@ -101,6 +101,7 @@ public class UserInterface extends GBFrame implements KeyListener {
 		
 		
 		BoardSolver board2 = new BoardSolver(rows5_5, columns5_5);
+		// BoardSolver board2 = new BoardSolver(rows5_1, columns5_1);
 		
 		board2.solve();
 		

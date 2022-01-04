@@ -8,6 +8,7 @@ public class Number {
     }
 
     public String toString() {
-        return ("val: " + val + "\tcompleted? " + completed);
+        // return ("val: " + val + "\tcompleted? " + completed);
+        return "_" + val + "_";
     }
 }
