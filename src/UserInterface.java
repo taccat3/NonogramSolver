@@ -8,19 +8,22 @@ import BreezySwing.*;
 
 public class UserInterface extends GBFrame implements KeyListener {
 
-	private LinkedList<JComponent> sizeGUI;
-	private LinkedList<JComponent> rcGUI;
-	private LinkedList<JComponent> boardGUI;
+	private static LinkedList<JComponent> sizeGUI;
+	private static LinkedList<JComponent> rcGUI;
+	private static LinkedList<JComponent> boardGUI;
 
 	private int height;
 	private int width;
 	private static JFrame frm;
+	private static BoardSolver board;
+	private static boolean ready;
 
 	public UserInterface() {
 		initSizeGUI();
 
 		height = 0;
 		width = 0;
+		ready = false;
 	}
 
 	public static void main(String[] args) {
@@ -28,60 +31,46 @@ public class UserInterface extends GBFrame implements KeyListener {
 		frm.setTitle("Nonogram Solver");
 		frm.setSize(500, 200);
 		frm.setVisible(true);
+
+		while(!ready) {
+			System.out.println(ready);
+			continue;
+		}
+
+		long time = System.currentTimeMillis();
+
+		int iterations = 0;
+		final int MAX = 10; // max number of iterations
+		final int STEPS = 6; // number of strategies one can solve with
+		String text = "starter text";
+	
+		do {
+			if(System.currentTimeMillis() - time > 2000) {
+				text = board.solve(iterations % STEPS);
+				((JTextArea) boardGUI.get(0)).setText(text);
+				iterations++;
+				System.out.println(iterations);
+				time = System.currentTimeMillis();
+				System.out.println("update");
+			}
+		} while(iterations < MAX && !text.equals("ERROR") && text.length() > 1 && text.charAt(text.length()-1) != 'a');
+
+		System.out.println("DONE");
+
 	}
 
 	public void buttonClicked(JButton btn) {
 		if (btn == sizeGUI.get(0)) {
-			IntegerField fldHeight = (IntegerField) (sizeGUI.get(1));
-			IntegerField fldWidth = (IntegerField) (sizeGUI.get(2));
-			if (fldHeight.isValidNumber() && fldWidth.isValidNumber()) {
-				height = fldHeight.getNumber();
-				width = fldWidth.getNumber();
-				hide(sizeGUI);
-				initRCGUI();
-			} else {
-				messageBox("Invalid Input try again");
-				if (!fldHeight.isValidNumber()) {
-					fldHeight.select(0, fldHeight.getText().length());
-					fldHeight.requestFocus();
-				}
-				if (!fldWidth.isValidNumber()) {
-					fldWidth.select(0, fldWidth.getText().length());
-					fldWidth.requestFocus();
-				}
-			}
+			sizeGUIActions();
 
 		} else if (btn == rcGUI.get(0)) {
+			
 			hide(rcGUI);
 
-			BoardSolver board = init();
+			board = init();
 			initBoardGUI(board);
 
-			long time = System.currentTimeMillis();
-
-			while(System.currentTimeMillis() - time < 2000) {
-				continue;
-			}
-
-			time = System.currentTimeMillis();
-
-			int iterations = 0;
-			final int MAX = 10; // max number of iterations
-			final int STEPS = 6; // number of strategies one can solve with
-			String text = "starter text";
-
-			do {
-				if(System.currentTimeMillis() - time > 1000) {
-					text = board.solve(iterations % STEPS);
-					((JTextArea) boardGUI.get(0)).setText(text);
-					iterations++;
-					System.out.println(iterations);
-					// System.out.println("iterations < MAX: " + (iterations < MAX));
-					// System.out.println("!text.equals(ERROR): " + !text.equals("ERROR"));
-					// System.out.println("text.charAt(text.length()-1) != 'a': " + (text.charAt(text.length()-1) != 'a'));
-					time = System.currentTimeMillis();
-				}
-			} while(iterations < MAX && !text.equals("ERROR") && text.length() > 1 && text.charAt(text.length()-1) != 'a');
+			ready = true;
 		}
 	}
 
@@ -179,8 +168,33 @@ public class UserInterface extends GBFrame implements KeyListener {
 		boardGUI.add(output);
 		output.setEditable(false);
 		output.setText(board.printBoard());
-		frm.setSize(600, 500);
+		frm.setSize(width * 50, height * 50);
 	}
+
+		private void sizeGUIActions() {
+			IntegerField fldHeight = (IntegerField) (sizeGUI.get(1));
+			IntegerField fldWidth = (IntegerField) (sizeGUI.get(2));
+			if (fldHeight.isValidNumber() && fldWidth.isValidNumber()) {
+				height = fldHeight.getNumber();
+				width = fldWidth.getNumber();
+
+				// TODO: delete
+				height = 5;
+				width = 5;
+				hide(sizeGUI);
+				initRCGUI();
+			} else {
+				messageBox("Invalid Input try again");
+				if (!fldHeight.isValidNumber()) {
+					fldHeight.select(0, fldHeight.getText().length());
+					fldHeight.requestFocus();
+				}
+				if (!fldWidth.isValidNumber()) {
+					fldWidth.select(0, fldWidth.getText().length());
+					fldWidth.requestFocus();
+				}
+			}
+		}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
