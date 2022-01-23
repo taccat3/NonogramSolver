@@ -160,7 +160,7 @@ public class Done extends Solving{
 			case ROW:
 				return board.rows[i][n];
 			case COLUMN:
-				return board.columns[n][i];
+				return board.columns[i][n];
 			default:
 				return null;
 		}

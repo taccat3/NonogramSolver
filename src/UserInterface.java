@@ -37,6 +37,11 @@ public class UserInterface extends GBFrame implements KeyListener {
 			continue;
 		}
 
+		solve();
+
+	}
+
+	private static void solve() {
 		long time = System.currentTimeMillis();
 
 		int iterations = 0;
@@ -53,10 +58,14 @@ public class UserInterface extends GBFrame implements KeyListener {
 				time = System.currentTimeMillis();
 				System.out.println("update");
 			}
-		} while(iterations < MAX && !text.equals("ERROR") && text.length() > 1 && text.charAt(text.length()-1) != 'a');
+		} while(iterations < MAX && !text.equals("ERROR") && notSolved(text));
 
 		System.out.println("DONE");
+	}
 
+	private static boolean notSolved(String str) {
+		final String END_TAG = "\nSOLVED";
+		return str.length() > END_TAG.length() && !str.substring(str.length()-END_TAG.length()).equals(END_TAG);
 	}
 
 	public void buttonClicked(JButton btn) {
@@ -130,7 +139,10 @@ public class UserInterface extends GBFrame implements KeyListener {
 				{ 3 },
 				{ 3 } };
 
-		return new BoardSolver(rows5_5, columns5_5);
+		int[][] rows10_1 = {{1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}};
+		int[][] columns10_1 = {{10}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}};
+
+		return new BoardSolver(rows10_1, columns10_1);
 	}
 
 	private void hide(List<JComponent> thing) {
@@ -139,18 +151,15 @@ public class UserInterface extends GBFrame implements KeyListener {
 		}
 	}
 
-	private void show(List<JComponent> thing) {
-		for (JComponent part : thing) {
-			part.setVisible(true);
-		}
-	}
-
 	private void initSizeGUI() {
 		sizeGUI = new LinkedList<JComponent>();
 
+		// TODO: delete HEIGHT and WIDTH --> set to 0
+		final int HEIGHT = 10;
+		final int WIDTH = 10;
 		sizeGUI.add(addButton("Set Size", 3, 2, 1, 1));
-		sizeGUI.add(addIntegerField(0, 1, 2, 1, 1)); // Height Field
-		sizeGUI.add(addIntegerField(0, 2, 2, 1, 1)); // Width Field
+		sizeGUI.add(addIntegerField(HEIGHT, 1, 2, 1, 1)); // Height Field
+		sizeGUI.add(addIntegerField(WIDTH, 2, 2, 1, 1)); // Width Field
 		sizeGUI.add(addLabel("Height: ", 1, 1, 1, 1));
 		sizeGUI.add(addLabel("Width: ", 2, 1, 1, 1));
 	}
@@ -171,30 +180,27 @@ public class UserInterface extends GBFrame implements KeyListener {
 		frm.setSize(width * 50, height * 50);
 	}
 
-		private void sizeGUIActions() {
-			IntegerField fldHeight = (IntegerField) (sizeGUI.get(1));
-			IntegerField fldWidth = (IntegerField) (sizeGUI.get(2));
-			if (fldHeight.isValidNumber() && fldWidth.isValidNumber()) {
-				height = fldHeight.getNumber();
-				width = fldWidth.getNumber();
+	private void sizeGUIActions() {
+		IntegerField fldHeight = (IntegerField) (sizeGUI.get(1));
+		IntegerField fldWidth = (IntegerField) (sizeGUI.get(2));
+		if (fldHeight.isValidNumber() && fldWidth.isValidNumber()) {
+			height = fldHeight.getNumber();
+			width = fldWidth.getNumber();
 
-				// TODO: delete
-				height = 5;
-				width = 5;
-				hide(sizeGUI);
-				initRCGUI();
-			} else {
-				messageBox("Invalid Input try again");
-				if (!fldHeight.isValidNumber()) {
-					fldHeight.select(0, fldHeight.getText().length());
-					fldHeight.requestFocus();
-				}
-				if (!fldWidth.isValidNumber()) {
-					fldWidth.select(0, fldWidth.getText().length());
-					fldWidth.requestFocus();
-				}
+			hide(sizeGUI);
+			initRCGUI();
+		} else {
+			messageBox("Invalid Input try again");
+			if (!fldHeight.isValidNumber()) {
+				fldHeight.select(0, fldHeight.getText().length());
+				fldHeight.requestFocus();
+			}
+			if (!fldWidth.isValidNumber()) {
+				fldWidth.select(0, fldWidth.getText().length());
+				fldWidth.requestFocus();
 			}
 		}
+	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {

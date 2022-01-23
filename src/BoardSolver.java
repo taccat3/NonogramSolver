@@ -63,7 +63,7 @@ public class BoardSolver {
 				// System.out.println("...");
 			} else {
 				System.out.println("SOLVED");
-				return board.printBoard() + "a";
+				return board.printBoard() + "\nSOLVED";
 			}
 
 			return board.printBoard();
