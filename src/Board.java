@@ -21,7 +21,7 @@ public class Board {
             str += (num != null ? num.val : null) + ", ";
         }
 
-        System.out.println("Column[1]: " + str);
+        // System.out.println("Column[1]: " + str);
 
         metaRows = getMeta(r);
         metaColumns = getMeta(c);

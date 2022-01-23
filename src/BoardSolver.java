@@ -28,51 +28,58 @@ public class BoardSolver {
 		board = new Board(r, c);
 	}
 
-	public void solve() {
-		System.out.println("\n\n\n\n\n\n\nSTART");
+	public String solve(int i) {
+		// System.out.println("\n\n\n\n\n\n\nSTART");
 
 		try {
-			System.out.println("fill in full strips");
-			fillInFullParts();
-			System.out.println(board.printBoard());
-
-			// fillInEdges();
-			System.out.println("fill in edges");
-			board = Edges.fillInEdges(board);
-			System.out.println(board.printBoard());
-
-			
-			System.out.println("fill in overlaps");
-			// checkOverlaps(); // TODO: add in skip Xs
-			board = Overlaps.checkOverlaps(board);
-			System.out.println(board.printBoard());
-
-			System.out.println("add x in Done Strips");
-			// fillDone();
-			board = Done.fillDone(board);
-			System.out.println(board.printBoard());
-
-			System.out.println("fill in overlaps 2");
-			// checkOverlaps(); // TODO: add in skip Xs
-			board = Overlaps.checkOverlaps(board);
-			System.out.println(board.printBoard());
+			if(i == 0) {
+				// System.out.println("fill in full strips");
+				fillInFullParts();
+				// System.out.println(board.printBoard());
+			} else if(i == 1) {
+				// fillInEdges();
+				// System.out.println("fill in edges");
+				board = Edges.fillInEdges(board);
+				// System.out.println(board.printBoard());
+			} else if(i == 3) {
+				// System.out.println("fill in overlaps");
+				// checkOverlaps(); // TODO: add in skip Xs
+				board = Overlaps.checkOverlaps(board);
+				// System.out.println(board.printBoard());
+			} else if(i == 4) {
+				// System.out.println("add x in Done Strips");
+				// fillDone();
+				board = Done.fillDone(board);
+				// System.out.println(board.printBoard());
+			} else if(i == 5) {
+				// System.out.println("fill in overlaps 2");
+				// checkOverlaps(); // TODO: add in skip Xs
+				board = Overlaps.checkOverlaps(board);
+				// System.out.println(board.printBoard());
+			}
 
 
 			if (!Done.isSolved(board)) {
-				System.out.println("...");
+				// System.out.println("...");
 			} else {
 				System.out.println("SOLVED");
+				return board.printBoard() + "a";
 			}
 
-			System.out.println(board.printBoard());
+			return board.printBoard();
 
 		} catch (IllegalSolutionException e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getLocalizedMessage());
 			e.printStackTrace();
+
+			return "ERROR";
 		}
 	}
 
+	public String printBoard() {
+		return board.printBoard();
+	}
 	// method should check if a section can be filled in due to being limited by an x on 1 side
 	private void fillInXLimited() {
 
