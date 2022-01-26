@@ -2,8 +2,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.Color;
 import javax.swing.*;
+
+import org.w3c.dom.css.RGBColor;
+
 import BreezySwing.*;
 
 public class UserInterface extends GBFrame implements KeyListener {
@@ -38,7 +40,6 @@ public class UserInterface extends GBFrame implements KeyListener {
 		}
 
 		solve();
-
 	}
 
 	private static void solve() {
@@ -73,17 +74,23 @@ public class UserInterface extends GBFrame implements KeyListener {
 			sizeGUIActions();
 
 		} else if (btn == rcGUI.get(0)) {
-			
-			hide(rcGUI);
 
-			board = init();
+			Parser parser = new Parser();
+
+			// TODO: error checking
+			int[][] rows = parser.parse(((JTextArea)(rcGUI.get(2))).getText());
+			int[][] columns = parser.parse(((JTextArea)(rcGUI.get(4))).getText());
+			
+			hide(rcGUI); // TODO: put rcGUI on a panel and then make the panel invisible
+
+			board = initBoardSolver(rows, columns);
 			initBoardGUI(board);
 
 			ready = true;
 		}
 	}
 
-	private BoardSolver init() {
+	private BoardSolver initBoardSolver(int[][] rows, int[][] columns) {
 		int[][] columns5_1 = { { 2, 2 },
 				{ 5 },
 				{ 0 },
@@ -142,7 +149,7 @@ public class UserInterface extends GBFrame implements KeyListener {
 		int[][] rows10_1 = {{1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}};
 		int[][] columns10_1 = {{10}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}};
 
-		return new BoardSolver(rows10_1, columns10_1);
+		return new BoardSolver(rows, columns);
 	}
 
 	private void hide(List<JComponent> thing) {
@@ -167,7 +174,15 @@ public class UserInterface extends GBFrame implements KeyListener {
 	private void initRCGUI() {
 		rcGUI = new LinkedList<JComponent>();
 
-		rcGUI.add(addButton("Done", 4, 1, 1, 1));
+		rcGUI.add(addButton("Done", 7, 2, 1, 1));
+		// row stuff
+		rcGUI.add(addLabel("Enter the Rows (use spaces per section and new lines per row)", 1, 1, 1, 1));
+		rcGUI.add(addTextArea("", 2, 1, 2, 2));
+		// columns stuff
+		rcGUI.add(addLabel("Enter the Columns (use spaces per section and new lines per column)", 4, 1, 1, 1));
+		rcGUI.add(addTextArea("", 5, 1, 2, 2));
+
+		frm.setSize(500, 400);
 	}
 
 	private void initBoardGUI(BoardSolver board) {
