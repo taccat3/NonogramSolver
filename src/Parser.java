@@ -3,8 +3,12 @@ import java.util.Arrays;
 
 public class Parser {
     
-    public int[][] parse(String str) {
+    public int[][] parse(String str, int numSections) {
         String[] sections = getSections(str.trim());
+
+        if(sections.length != numSections) {
+            throw new IllegalArgumentException("Not enough/too many sections entered");
+        }
 
         ArrayList<int[]> rc_al = new ArrayList<int[]>();
         int max = 0;

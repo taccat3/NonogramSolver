@@ -1,12 +1,15 @@
 import java.util.LinkedList;
 import java.util.List;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.*;
 
-import org.w3c.dom.css.RGBColor;
-
 import BreezySwing.*;
+
+// TODO: error checking for too big section values
 
 public class UserInterface extends GBFrame implements KeyListener {
 
@@ -14,32 +17,100 @@ public class UserInterface extends GBFrame implements KeyListener {
 	private static LinkedList<JComponent> rcGUI;
 	private static LinkedList<JComponent> boardGUI;
 
+
 	private int height;
 	private int width;
 	private static JFrame frm;
 	private static BoardSolver board;
 	private static boolean ready;
+	
+	private static final Color COLOR = Color.getHSBColor((float).203, (float)0.23, (float)0.79);
 
 	public UserInterface() {
+		// TODO: uncomment
+		splashScreen("<html><br><center>&#9;Please Note that any incorrect input will likely result in a convoluted error.&#9;<br><br>Please plan accordingly :)</center><br></html>");
+		splashScreen("<html><br><center>&#9;Also Note that this probably won't work. :'(&#9;<br><br></center><html>");
 		initSizeGUI();
 
 		height = 0;
 		width = 0;
 		ready = false;
+
+	}
+
+	private void splashScreen(String message) {
+		JFrame splash = new JFrame();
+		splash.add(addLabel(message, 1, 1, 1, 1));
+
+		splash.getContentPane().setBackground(COLOR);
+		splash.setUndecorated(true);
+
+		splash.pack();
+		splash.setLocationRelativeTo(null);
+		splash.setVisible(true);
+
+		long time = System.currentTimeMillis();
+		while(System.currentTimeMillis() - time < 3000) {
+			continue;
+		}
+
+		splash.setVisible(false);
 	}
 
 	public static void main(String[] args) {
 		frm = new UserInterface();
 		frm.setTitle("Nonogram Solver");
-		frm.setSize(500, 200);
+		frm.pack();
+		frm.setLocationRelativeTo(null);
+		frm.getContentPane().setBackground(COLOR);
 		frm.setVisible(true);
 
-		while(!ready) {
+		while (!ready) {
 			System.out.println(ready);
 			continue;
 		}
 
 		solve();
+	}
+
+	private JPanel panel(String str, int num, int length) {
+		JPanel panel = new JPanel();
+
+		panel.setBackground(COLOR);
+
+		// panel.setBorder (new TitledBorder(new EtchedBorder(), "Display Area"));
+
+		// create the middle panel components
+		JTextArea info = new JTextArea(num, 1);
+		JTextArea input = new JTextArea(num, length);
+
+		info.setBackground(COLOR);
+		info.setText(getInputLabels(str, num));
+		info.setEditable(false); // set textArea non-editable
+
+		input.setBackground(COLOR.darker());
+		input.setBounds(new Rectangle(input.getX(), input.getY(), num, length));
+
+		JScrollPane scroll = new JScrollPane(input); // was info
+		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scroll.setVisible(false);
+
+		//Add TextArea in to middle panel
+		panel.add(info);
+		panel.add(input);
+		panel.add(scroll);
+
+		return panel;
+	}
+
+	private static String getInputLabels(String str, int num) {
+		String label = "";
+		
+		for(int i = 1; i <= num; i++) {
+			label += str + " " + i + ":\n";
+		}
+
+		return label;
 	}
 
 	private static void solve() {
@@ -49,9 +120,9 @@ public class UserInterface extends GBFrame implements KeyListener {
 		final int MAX = 10; // max number of iterations
 		final int STEPS = 6; // number of strategies one can solve with
 		String text = "starter text";
-	
+
 		do {
-			if(System.currentTimeMillis() - time > 2000) {
+			if (System.currentTimeMillis() - time > 2000) {
 				text = board.solve(iterations % STEPS);
 				((JTextArea) boardGUI.get(0)).setText(text);
 				iterations++;
@@ -59,14 +130,14 @@ public class UserInterface extends GBFrame implements KeyListener {
 				time = System.currentTimeMillis();
 				System.out.println("update");
 			}
-		} while(iterations < MAX && !text.equals("ERROR") && notSolved(text));
+		} while (iterations < MAX && !text.equals("ERROR") && notSolved(text));
 
 		System.out.println("DONE");
 	}
 
 	private static boolean notSolved(String str) {
 		final String END_TAG = "\nSOLVED";
-		return str.length() > END_TAG.length() && !str.substring(str.length()-END_TAG.length()).equals(END_TAG);
+		return str.length() > END_TAG.length() && !str.substring(str.length() - END_TAG.length()).equals(END_TAG);
 	}
 
 	public void buttonClicked(JButton btn) {
@@ -78,10 +149,19 @@ public class UserInterface extends GBFrame implements KeyListener {
 			Parser parser = new Parser();
 
 			// TODO: error checking
-			int[][] rows = parser.parse(((JTextArea)(rcGUI.get(2))).getText());
-			int[][] columns = parser.parse(((JTextArea)(rcGUI.get(4))).getText());
-			
-			hide(rcGUI); // TODO: put rcGUI on a panel and then make the panel invisible
+			int[][] rows = null;
+			int[][] columns = null;
+
+			try {
+				rows = parser.parse(((JTextArea) (rcGUI.get(1)).getComponents()[1]).getText(), height);
+				columns = parser.parse(((JTextArea) (rcGUI.get(2)).getComponents()[1]).getText(), width);
+			} catch (IllegalArgumentException e) {
+				messageBox("need to enter " + height + " rows and " + width
+						+ "columns\nEnter 0s if there is none in a section");
+				return;
+			}
+
+			hide(rcGUI);
 
 			board = initBoardSolver(rows, columns);
 			initBoardGUI(board);
@@ -146,8 +226,8 @@ public class UserInterface extends GBFrame implements KeyListener {
 				{ 3 },
 				{ 3 } };
 
-		int[][] rows10_1 = {{1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}};
-		int[][] columns10_1 = {{10}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}};
+		int[][] rows10_1 = { { 1 }, { 1 }, { 1 }, { 1 }, { 1 }, { 1 }, { 1 }, { 1 }, { 1 }, { 1 } };
+		int[][] columns10_1 = { { 10 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } };
 
 		return new BoardSolver(rows, columns);
 	}
@@ -176,13 +256,21 @@ public class UserInterface extends GBFrame implements KeyListener {
 
 		rcGUI.add(addButton("Done", 7, 2, 1, 1));
 		// row stuff
-		rcGUI.add(addLabel("Enter the Rows (use spaces per section and new lines per row)", 1, 1, 1, 1));
-		rcGUI.add(addTextArea("", 2, 1, 2, 2));
-		// columns stuff
-		rcGUI.add(addLabel("Enter the Columns (use spaces per section and new lines per column)", 4, 1, 1, 1));
-		rcGUI.add(addTextArea("", 5, 1, 2, 2));
+		// rcGUI.add(addLabel("Enter the Rows (use spaces per section and new lines per row)", 1, 1, 1, 1));
+		// rcGUI.add(addTextArea("", 2, 1, 2, 2));
+		// // columns stuff
+		// rcGUI.add(addLabel("Enter the Columns (use spaces per section and new lines per column)", 4, 1, 1, 1));
+		// rcGUI.add(addTextArea("", 5, 1, 2, 2));
 
-		frm.setSize(500, 400);
+		rcGUI.add(panel("Row", height, width));
+		rcGUI.add(panel("Column", width, height));
+
+		frm.add(rcGUI.get(1));
+		frm.add(rcGUI.get(2));
+
+		frm.pack();
+
+		// frm.setSize(frm.getHeight(), frm.getWidth());
 	}
 
 	private void initBoardGUI(BoardSolver board) {
@@ -193,6 +281,9 @@ public class UserInterface extends GBFrame implements KeyListener {
 		output.setEditable(false);
 		output.setText(board.printBoard());
 		frm.setSize(width * 50, height * 50);
+
+		frm.pack();
+		frm.setSize(frm.getHeight() + 10, frm.getWidth() + 10);
 	}
 
 	private void sizeGUIActions() {
