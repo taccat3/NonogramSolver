@@ -25,11 +25,12 @@ public class UserInterface extends GBFrame implements KeyListener {
 	private static boolean ready;
 	
 	private static final Color COLOR = Color.getHSBColor((float).203, (float)0.23, (float)0.79);
+	private static int UPDATE_TIME = 500;
 
 	public UserInterface() {
 		// TODO: uncomment
-		splashScreen("<html><br><center>&#9;Please Note that any incorrect input will likely result in a convoluted error.&#9;<br><br>Please plan accordingly :)</center><br></html>");
-		splashScreen("<html><br><center>&#9;Also Note that this probably won't work. :'(&#9;<br><br></center><html>");
+		// splashScreen("<html><br><center>&#9;Please Note that any incorrect input will likely result in a convoluted error.&#9;<br><br>Please plan accordingly :)</center><br></html>");
+		// splashScreen("<html><br><center>&#9;Also Note that this probably won't work. :'(&#9;<br><br></center><html>");
 		initSizeGUI();
 
 		height = 0;
@@ -61,6 +62,7 @@ public class UserInterface extends GBFrame implements KeyListener {
 		frm = new UserInterface();
 		frm.setTitle("Nonogram Solver");
 		frm.pack();
+		frm.setSize(frm.getWidth() + 50, frm.getHeight() + 50);
 		frm.setLocationRelativeTo(null);
 		frm.getContentPane().setBackground(COLOR);
 		frm.setVisible(true);
@@ -117,12 +119,12 @@ public class UserInterface extends GBFrame implements KeyListener {
 		long time = System.currentTimeMillis();
 
 		int iterations = 0;
-		final int MAX = 10; // max number of iterations
+		final int MAX = 20; // max number of iterations
 		final int STEPS = 6; // number of strategies one can solve with
 		String text = "starter text";
 
 		do {
-			if (System.currentTimeMillis() - time > 2000) {
+			if (System.currentTimeMillis() - time > UPDATE_TIME) {
 				text = board.solve(iterations % STEPS);
 				((JTextArea) boardGUI.get(0)).setText(text);
 				iterations++;
@@ -242,8 +244,8 @@ public class UserInterface extends GBFrame implements KeyListener {
 		sizeGUI = new LinkedList<JComponent>();
 
 		// TODO: delete HEIGHT and WIDTH --> set to 0
-		final int HEIGHT = 10;
-		final int WIDTH = 10;
+		final int HEIGHT = 30;
+		final int WIDTH = 25;
 		sizeGUI.add(addButton("Set Size", 3, 2, 1, 1));
 		sizeGUI.add(addIntegerField(HEIGHT, 1, 2, 1, 1)); // Height Field
 		sizeGUI.add(addIntegerField(WIDTH, 2, 2, 1, 1)); // Width Field

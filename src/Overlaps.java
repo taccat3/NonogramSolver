@@ -9,7 +9,7 @@ public class Overlaps extends Solving {
 	}
 
 	private static Board checkOverlapsStrips(Board board, Board.RC rc) throws IllegalSolutionException {
-		for (int i = 0; i < board.height; i++) {
+		for (int i = 0; i < getNumStrips(board, rc); i++) {
 			if(alreadyDone(board, i, rc)) {
 				continue;
 			}
@@ -30,7 +30,7 @@ public class Overlaps extends Solving {
 				// try to add the number
 				if (num != null) { // check if number exists
 					int numNeeded = num.val;
-					for (int count = index; count <= index + num.val; count++) {
+					for (int count = index; count <= index + num.val && count < getLength(board, rc); count++) {
 						// check if they fit
 						if (board.isX(rc, i, count)) {
 							// remove filled in spots for the num in "row"
@@ -90,7 +90,7 @@ public class Overlaps extends Solving {
             if (num != null) {
                 int numNeeded = num.val;
 
-                for (int count = index; count >= index - num.val; count--) {
+                for (int count = index; count >= index - num.val && count > 0; count--) {
 
                     // check if they fit
                     if (board.isX(rc, i, count)) {

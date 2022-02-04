@@ -1,3 +1,5 @@
+import Board.RC;
+
 public class Edges {
     
     Board board;
@@ -43,12 +45,21 @@ public class Edges {
 	}
 
 	private static Board fillInLastRow(Board board) {
+		// i is the column index
 		for (int i = 0; i < board.width; i++) {
+
+			// if the square is filled
 			if (board.isFilled(board.height - 1, i)) {
-				if (board.columns[i][board.columns[i].length - 1] == null) {
-					break;
+
+				// get the last section in the column
+				int indexOfLastNumInColumn = 0;
+				for (int k = board.columns[i].length - 1; k > 0; k--) {
+					if(board.columns[i][k] != null) {
+						indexOfLastNumInColumn = k;
+						break;
+					}
 				}
-				int indexOfLastNumInColumn = board.columns[i].length - 1;
+
 				for (int j = board.height - board.columns[i][indexOfLastNumInColumn].val; j < board.height; j++) {
 					board.fill(j, i);
 				}
@@ -63,22 +74,35 @@ public class Edges {
 	}
 
 	private static Board fillInLastColumn(Board board) {
+		// check each index in the last column (0-[height-1])
 		for (int i = 0; i < board.height; i++) {
+
+			// check if index is filled, i is row, board.width-1 = last column
 			if (board.isFilled(i, board.width - 1)) {
 				int indexOfLastNumInRow = 0;
+
+				// get the last section num in the row that will be filled in
 				for (int j = board.rows[i].length - 1; j >= 0; j--) {
 					if (board.rows[i][j] != null) {
 						indexOfLastNumInRow = j;
 						break;
 					}
 				}
-				for (int j = board.width - board.rows[i][indexOfLastNumInRow].val; j < board.width; j++) {
+
+				for(int j = board.width - 1; j >= board.width - board.rows[i][indexOfLastNumInRow].val; j--) {
+					if(j == board.width - board.rows[i][indexOfLastNumInRow].val && j > 0 && board.isEmpty(Board.RC.ROW, i, j)) {
+						board.setX(i, j);
+						break;
+					}
 					board.fill(i, j);
 				}
-				if (board.columns[i][0].val < board.width) {
-					board.setX(i, board.width - board.rows[i][indexOfLastNumInRow].val - 1);
-				}
-				board.columns[i][indexOfLastNumInRow].completed = true;
+				// for (int j = board.width - board.rows[i][indexOfLastNumInRow].val; j < board.width; j++) {
+				// 	board.fill(i, j);
+				// }
+				// if (board.columns[i][0].val < board.width) {
+				// 	board.setX(i, board.width - board.rows[i][indexOfLastNumInRow].val - 1);
+				// }
+				board.rows[i][indexOfLastNumInRow].completed = true;
 			}
 		}
 

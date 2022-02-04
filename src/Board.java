@@ -88,8 +88,6 @@ public class Board {
         answers[i][j] = State.EMPTY;
     }
 
-
-
     public void fill(RC rc, int i, int j) {
         switch(rc) {
             case ROW:
@@ -111,10 +109,6 @@ public class Board {
                 break;
         }
     }
-
-
-
-
 
     public boolean isFilled(RC rc, int i, int j) {
         switch(rc) {
@@ -162,9 +156,6 @@ public class Board {
         return answers[i][j] == State.EMPTY;
     }
 
-
-
-
     public String printBoard() {
         String str = "";
 
@@ -179,21 +170,30 @@ public class Board {
         for (int i = 0; i < max; i++) {
             str += "   ";
         }
-        str += " _";
+        str += "  _";
 
         for (int i = 0; i < width; i++) {
             str += "__";
         }
-        str += "\n" + getColumns(max) + " _";
+
+        // add the columns
+        str += "\n  " + getColumns(max) + " __";
         for (int i = 0; i < max; i++) {
             str += "___";
         }
         for (int i = 0; i < width; i++) {
             str += "__";
         }
+
+        // for (int i = 0; i < width + max; i++) {
+        //     str += "___";
+        // }
+
+
+
         int rowCount = 0;
         for (State[] row : answers) {
-            str += "\n| " + getRow(rowCount) + "| ";
+            str += "\n|" + getRow(rowCount) + "|";
             rowCount++;
             for (State square : row) {
                 if(square == State.FILLED) {
@@ -209,10 +209,7 @@ public class Board {
             str += "|";
         }
 
-        str += "\n _";
-        for (int i = 0; i < max; i++) {
-            str += "___";
-        }
+        str += "\n ____";
         for (int i = 0; i < width; i++) {
             str += "__";
         }
@@ -230,14 +227,19 @@ public class Board {
         for (int i = columns[0].length - 1; i >= 0; i--) { // height/2 is the greatest possible number of sections
                                                             // in a column
             for (int j = 0; j < indent; j++) {
-                str += "   ";
+                str += "  ";
             }
-            str += "| ";
+            str += "|";
             for (Number[] column : columnReverse) {
                 if (column[i] == null) {
                     str += "  ";
                 } else {
-                    str += column[i].val + " ";
+                    int num = column[i].val;
+                    if(num > 9) {
+                        str += num + "";
+                    } else {
+                        str += num + " ";
+                    }
                 }
             }
             str += "|\n";
@@ -252,7 +254,12 @@ public class Board {
             if (num == null) {
                 str += "  ";
             } else {
-                str += num.val + " ";
+                int n = num.val;
+                if(n > 9) {
+                    str += n + "";
+                } else {
+                    str += n + " ";
+                }
             }
         }
 

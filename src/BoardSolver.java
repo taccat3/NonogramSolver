@@ -128,12 +128,14 @@ public class BoardSolver {
 			if (isFullToStart(j, RC.ROW)) {
 				int columnNum = 0;
 				for (Number num : board.rows[j]) {
-					for (int i = 0; i < num.val; i++) {
-						board.fill(curr, columnNum++);
-					}
-					num.completed = true;
-					if (columnNum < board.width) {
-						board.setX(curr, columnNum++);
+					if(num != null) {
+						for (int i = 0; i < num.val; i++) {
+							board.fill(curr, columnNum++);
+						}
+						num.completed = true;
+						if (columnNum < board.width) {
+							board.setX(curr, columnNum++);
+						}
 					}
 				}
 			}
@@ -147,7 +149,7 @@ public class BoardSolver {
 				int rowNum = 0;
 				for (Number num : board.columns[j]) {
 					if (num == null) {
-						break;
+						continue;
 					}
 					for (int i = 0; i < num.val; i++) {
 						board.fill(rowNum++, curr);
